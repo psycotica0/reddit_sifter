@@ -2,6 +2,7 @@ buildscript {
     ext.kotlin_version = '1.0.0'
     repositories {
         jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -16,4 +17,26 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+        compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+        compile 'com.google.code.gson:gson:2.4'
+        compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
+        compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
+        compile 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta2'
+}
+
+// Broken Somehow
+// Command works on cli directly
+task run(type: Exec, dependsOn: 'installDebug') {
+    // linux
+    commandLine 'adb', 'shell', 'am', 'start', '-n', 'ca.psycoti.reddit/.HelloActivity'
 }
