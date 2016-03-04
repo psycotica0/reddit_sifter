@@ -17,21 +17,26 @@ import com.google.gson.FieldNamingPolicy
 import java.lang.reflect.Type
 
 import ca.psycoti.reddit.models.Listing;
+import ca.psycoti.reddit.models.Entry;
 
 
 
 interface HotService {
   @GET("/hot.json")
-  public fun hot(): Observable<JsonElement>
+  public fun hot(): Observable<Listing>
 
   companion object {
-    fun create(): HotService {
-      val gsonBuilder = GsonBuilder()
+    fun gson() = GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .registerTypeAdapter(Listing::class.java, Listing.Deserializer)
+        .registerTypeAdapter(Entry::class.java, Entry.Deserializer)
+        .create()
 
+    fun create(): HotService {
       val adapter = Retrofit.Builder()
         .baseUrl("https://api.reddit.com")
         .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
+        .addConverterFactory(GsonConverterFactory.create(gson()))
         .build()
 
       return adapter.create(HotService::class.java)
