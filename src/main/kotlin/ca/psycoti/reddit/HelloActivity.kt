@@ -12,7 +12,7 @@ open class HelloActivity : Activity() {
 
   override fun onStart() {
     super.onStart()
-    val textView: TextView = findViewById(R.id.text_view) as TextView
+    val textView = findViewById(R.id.text_view) as TextView
     textView.setText("Hello Kotlin!")
   }
 }
