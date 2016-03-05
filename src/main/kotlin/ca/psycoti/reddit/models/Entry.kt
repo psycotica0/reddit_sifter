@@ -13,7 +13,7 @@ import java.util.ArrayList
 import java.lang.reflect.Type
 
 
-data class Entry(val title: String, val subreddit: String) {
+data class Entry(val title: String, val subreddit: String, val thumbnail: String) {
   object Deserializer: JsonDeserializer<Entry> {
     override fun deserialize(je: JsonElement, type: Type, jdc: JsonDeserializationContext): Entry
     {
