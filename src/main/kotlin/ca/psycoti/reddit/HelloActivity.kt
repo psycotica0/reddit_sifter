@@ -3,22 +3,58 @@ package ca.psycoti.reddit
 import android.os.Bundle
 import android.app.Activity
 import android.widget.TextView
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import android.support.v7.widget.RecyclerView
+import android.view.View
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import android.support.v7.widget.LinearLayoutManager
 
 import ca.psycoti.reddit.network.HotService
 
+import ca.psycoti.reddit.models.Entry
+
 open class HelloActivity : Activity() {
+  lateinit var entries: RecyclerView
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.front)
+
+    entries = findViewById(R.id.list_view) as RecyclerView
+    entries.layoutManager = LinearLayoutManager(this)
   }
 
   override fun onStart() {
     super.onStart()
     val textView = findViewById(R.id.text_view) as TextView
     textView.setText("Hello Kotlin!")
-    HotService.create().hot().subscribe(
-      { obj -> textView.setText(obj.toString())},
-      { err -> textView.setText(err.toString())}
+    HotService.create().hot()
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribe(
+      { obj -> entries.setAdapter(EntryAdapter(obj.entries)) },
+      { err -> textView.setText(err.toString()) }
     )
+  }
+
+  class EntryAdapter(val items : List<Entry>): RecyclerView.Adapter<EntryAdapter.EntryViewHolder>() {
+    override fun getItemCount() = items.count()
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
+      val view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false)
+      return EntryViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
+      holder.titleView.text = items[position].title
+      holder.subredditView.text = items[position].subreddit
+    }
+
+    class EntryViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+      val titleView: TextView = view.findViewById(R.id.title) as TextView
+      val subredditView: TextView = view.findViewById(R.id.subreddit) as TextView
+    }
   }
 }
