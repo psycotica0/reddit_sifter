@@ -13,13 +13,19 @@ import android.view.LayoutInflater
 import android.support.v7.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import android.content.Context
+import java.util.ArrayList
+
+import com.jakewharton.rxbinding.view.clicks
 
 import ca.psycoti.reddit.network.HotService
 
 import ca.psycoti.reddit.models.Entry
+import ca.psycoti.reddit.models.Listing
 
 open class HelloActivity : Activity() {
   lateinit var entries: RecyclerView
+  val listing = Listing()
+  val adapter = EntryAdapter(this)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -33,16 +39,29 @@ open class HelloActivity : Activity() {
     super.onStart()
     val textView = findViewById(R.id.text_view) as TextView
     textView.setText("Hello Kotlin!")
-    HotService.create().hot()
-      .subscribeOn(Schedulers.io())
-      .observeOn(AndroidSchedulers.mainThread())
-      .subscribe(
-      { obj -> entries.setAdapter(EntryAdapter(this, obj.entries)) },
-      { err -> textView.setText(err.toString()) }
+    textView.clicks().subscribe({listing.loadMore()})
+    entries.setAdapter(adapter)
+
+    listing.diff.subscribe(
+      {diff ->
+        adapter.items = listing.entries
+        diff.items.forEach({
+          when(it) {
+            is Listing.Insert -> {
+              adapter.notifyItemInserted(it.pos)
+            }
+            is Listing.Move -> {
+              adapter.notifyItemMoved(it.from, it.to)
+            }
+          }
+        })
+      },
+      {err -> textView.setText(err.toString())}
     )
+    listing.loadMore()
   }
 
-  class EntryAdapter(val context : Context, val items : List<Entry>): RecyclerView.Adapter<EntryAdapter.EntryViewHolder>() {
+  class EntryAdapter(val context : Context, var items : List<Entry> = ArrayList()): RecyclerView.Adapter<EntryAdapter.EntryViewHolder>() {
     override fun getItemCount() = items.count()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {

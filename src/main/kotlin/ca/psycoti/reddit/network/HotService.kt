@@ -23,7 +23,7 @@ import ca.psycoti.reddit.models.Entry;
 
 interface HotService {
   @GET("/hot.json")
-  public fun hot(): Observable<Listing>
+  public fun hot(@Query("after") after: String? = null): Observable<Listing>
 
   companion object {
     fun gson() = GsonBuilder()
