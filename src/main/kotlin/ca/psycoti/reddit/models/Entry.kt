@@ -14,7 +14,7 @@ import java.lang.reflect.Type
 
 import com.github.salomonbrys.kotson.*
 
-data class Entry(val title: String, val subreddit: String, val thumbnail: String, val images: ImageSet?) {
+data class Entry(val title: String, val subreddit: String, val url: String, val images: ImageSet?) {
   object Deserializer: JsonDeserializer<Entry> {
     override fun deserialize(je: JsonElement, type: Type, jdc: JsonDeserializationContext): Entry
     {
@@ -24,7 +24,7 @@ data class Entry(val title: String, val subreddit: String, val thumbnail: String
         ImageSet.parse(data["preview"])
         else null
 
-      return Entry(data["title"].string, data["subreddit"].string, data["thumbnail"].string, imageSet)
+      return Entry(data["title"].string, data["subreddit"].string, data["url"].string, imageSet)
     }
   }
 
