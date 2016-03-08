@@ -22,7 +22,7 @@ import ca.psycoti.reddit.models.Entry;
 
 
 interface HotService {
-  @GET("/hot.json")
+  @GET("/hot.json?raw_json=1")
   public fun hot(@Query("after") after: String? = null): Observable<Listing>
 
   companion object {

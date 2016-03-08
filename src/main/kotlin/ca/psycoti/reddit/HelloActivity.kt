@@ -14,6 +14,8 @@ import android.support.v7.widget.LinearLayoutManager
 import com.squareup.picasso.Picasso
 import android.content.Context
 import java.util.ArrayList
+import android.util.DisplayMetrics
+import android.view.WindowManager
 
 import com.jakewharton.rxbinding.view.clicks
 
@@ -42,6 +44,13 @@ open class HelloActivity : Activity() {
     textView.clicks().subscribe({listing.loadMore()})
     entries.setAdapter(adapter)
 
+    val metrics = DisplayMetrics()
+
+    getWindowManager()
+      .getDefaultDisplay()
+      .getMetrics(metrics);
+    adapter.width = metrics.widthPixels
+
     listing.diff.subscribe(
       {diff ->
         adapter.items = listing.entries
@@ -63,6 +72,7 @@ open class HelloActivity : Activity() {
 
   class EntryAdapter(val context : Context, var items : List<Entry> = ArrayList()): RecyclerView.Adapter<EntryAdapter.EntryViewHolder>() {
     override fun getItemCount() = items.count()
+    var width: Int = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
       val view = LayoutInflater.from(context).inflate(R.layout.item, parent, false)
@@ -70,13 +80,20 @@ open class HelloActivity : Activity() {
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
-      val (title, subreddit, thumbnail) = items[position]
+      val (title, subreddit, thumbnail, imageSet) = items[position]
       holder.titleView.text = title
       holder.subredditView.text = subreddit
-      if (thumbnail.isNotBlank()) {
-        Picasso.with(context).load(thumbnail).into(holder.thumbnail)
-      } else {
+
+      val img = imageSet?.biggestImage(width)
+
+      if (img == null || img.url.isBlank()) {
         holder.thumbnail.setImageDrawable(null)
+        holder.thumbnail.visibility = View.GONE
+      } else {
+        holder.thumbnail.visibility = View.VISIBLE
+        Picasso.with(context).load(img.url).into(holder.thumbnail)
+        holder.thumbnail.layoutParams.height = img.height
+        holder.thumbnail.layoutParams.width = img.width
       }
     }
 
