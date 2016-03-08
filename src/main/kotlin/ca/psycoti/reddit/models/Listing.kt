@@ -15,16 +15,15 @@ import rx.schedulers.Schedulers
 
 import rx.subjects.PublishSubject
 
-
-import java.util.ArrayList
-
 import java.lang.reflect.Type
+import kotlin.collections.List
 
-inline fun l(s : String) = android.util.Log.e("TEST", s)
-inline fun <reified T> genericType() = object: TypeToken<T>() {}.type
+import com.github.salomonbrys.kotson.*
 
-data class Listing(val kind: String, val entries: ArrayList<Entry>, var after: String?) {
-  constructor() : this("Listing", ArrayList(), null)
+fun l(s : String) = android.util.Log.e("TEST", s)
+
+data class Listing(val kind: String, val entries: MutableList<Entry>, var after: String?) {
+  constructor() : this("Listing", arrayListOf<Entry>(), null)
   val service = HotService.create()
 
   val loadAfter = PublishSubject.create<String>()
@@ -46,7 +45,7 @@ data class Listing(val kind: String, val entries: ArrayList<Entry>, var after: S
   data class Diff(val items: List<Operation>)
 
   fun merge(other: Listing) : Diff {
-    val init = Pair(this.entries.count(), ArrayList<Operation>())
+    val init = Pair(this.entries.count(), listOf<Operation>())
     val (n, operations) = other.entries.fold(
       init,
       fun (state, item) : Pair<Int, List<Operation>> {
@@ -72,13 +71,12 @@ data class Listing(val kind: String, val entries: ArrayList<Entry>, var after: S
   object Deserializer: JsonDeserializer<Listing> {
     override fun deserialize(je: JsonElement, type: Type, jdc: JsonDeserializationContext): Listing
     {
-      val kind = je.asJsonObject.get("kind").getAsString()
-      val data = je.asJsonObject.getAsJsonObject("data")
-      val list = data.getAsJsonArray("children")
-      val after = data.get("after").asString
+      val kind = je["kind"].string
+      val data = je["data"].obj
+      val list = data["children"].array
+      val after = data["after"].nullString
 
-      val subtype = genericType<ArrayList<Entry>>()
-      val jList = HotService.gson().fromJson<ArrayList<Entry>>(list, subtype)
+      val jList = HotService.gson().fromJson<MutableList<Entry>>(list)
 
       return Listing(kind, jList, after)
     }
