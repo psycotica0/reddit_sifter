@@ -17,6 +17,8 @@ import java.util.ArrayList
 import android.util.DisplayMetrics
 import android.view.WindowManager
 
+import android.support.percent.PercentFrameLayout
+
 import com.jakewharton.rxbinding.view.clicks
 
 import ca.psycoti.reddit.network.HotService
@@ -91,9 +93,11 @@ open class HelloActivity : Activity() {
         holder.thumbnail.visibility = View.GONE
       } else {
         holder.thumbnail.visibility = View.VISIBLE
+        val pParams = holder.thumbnail.layoutParams as? PercentFrameLayout.LayoutParams
+        if (pParams != null) {
+          pParams.percentLayoutInfo.aspectRatio =  img.width.toFloat() / img.height.toFloat()
+        }
         Picasso.with(context).load(img.url).into(holder.thumbnail)
-        holder.thumbnail.layoutParams.height = img.height
-        holder.thumbnail.layoutParams.width = img.width
       }
     }
 

@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:auto="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:orientation="vertical"
   android:padding="8dp"
 >
- <ImageView
-  android:id="@+id/thumbnail"
-  android:layout_width="wrap_content"
+ <android.support.percent.PercentFrameLayout
+  android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:layout_gravity="center"
- />
+ >
+   <ImageView
+    android:id="@+id/thumbnail"
+    auto:layout_widthPercent="100%"
+    auto:layout_aspectRatio="0%"
+    android:layout_gravity="center"
+   />
+ </android.support.percent.PercentFrameLayout>
  <TextView
   android:id="@+id/title"
   android:layout_width="wrap_content"
