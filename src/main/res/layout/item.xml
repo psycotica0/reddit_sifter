@@ -1,31 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v7.widget.CardView
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:auto="http://schemas.android.com/apk/res-auto"
+  xmlns:percent_layout="http://schemas.android.com/apk/res-auto"
+  xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:orientation="vertical"
-  android:padding="8dp"
+  card_view:cardCornerRadius="4dp"
+  android:layout_margin="8dp"
 >
- <android.support.percent.PercentFrameLayout
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
- >
-   <ImageView
-    android:id="@+id/thumbnail"
-    auto:layout_widthPercent="100%"
-    auto:layout_aspectRatio="0%"
-    android:layout_gravity="center"
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+  >
+   <android.support.percent.PercentFrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+   >
+     <ImageView
+      android:id="@+id/thumbnail"
+      percent_layout:layout_widthPercent="100%"
+      percent_layout:layout_aspectRatio="0%"
+      android:layout_gravity="center"
+     />
+   </android.support.percent.PercentFrameLayout>
+   <TextView
+    android:id="@+id/title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
    />
- </android.support.percent.PercentFrameLayout>
- <TextView
-  android:id="@+id/title"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
- />
- <TextView
-  android:id="@+id/subreddit"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
- />
-</LinearLayout>
+   <TextView
+    android:id="@+id/subreddit"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+   />
+  </LinearLayout>
+</android.support.v7.widget.CardView>
