@@ -48,7 +48,10 @@ open class HelloActivity : Activity() {
     entries.setAdapter(adapter)
 
     adapter.clickedItems.subscribe {
-      startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.url)))
+      //startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.url)))
+      val intent = Intent(this, ItemViewActivity::class.java)
+      intent.putExtra(ItemViewActivity.URL, it.url)
+      startActivity(intent)
     }
 
     val metrics = DisplayMetrics()
