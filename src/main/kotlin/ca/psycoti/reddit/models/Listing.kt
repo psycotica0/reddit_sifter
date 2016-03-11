@@ -60,6 +60,7 @@ data class Listing(val kind: String, val entries: MutableList<Entry>, var after:
           // Move
           l("Move " + pos + " to "+ idx)
           this.entries.removeAt(pos)
+          this.entries.add(item)
           return Pair(idx, ops + Move(pos, idx))
         }
       }
