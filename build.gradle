@@ -50,5 +50,5 @@ dependencies {
 // Command works on cli directly
 task run(type: Exec, dependsOn: 'installDebug') {
     // linux
-    commandLine 'adb', 'shell', 'am', 'start', '-n', 'ca.psycoti.reddit/.HelloActivity'
+    commandLine './run.sh'
 }
