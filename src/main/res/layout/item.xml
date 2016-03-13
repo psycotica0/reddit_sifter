@@ -8,14 +8,13 @@
   android:layout_height="wrap_content"
   card_view:cardCornerRadius="4dp"
   android:layout_margin="8dp"
-  android:background="?android:attr/selectableItemBackground"
+  android:foreground="?android:attr/selectableItemBackground"
   android:stateListAnimator="@anim/lift_on_touch"
 >
   <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="?android:attr/selectableItemBackground"
   >
    <android.support.percent.PercentFrameLayout
     android:layout_width="match_parent"
