@@ -120,7 +120,7 @@ open class HelloActivity : Activity() {
       when(holder) {
         is LoadingViewHolder -> {loadingSignal.onNext(Unit)}
         is EntryViewHolder -> {
-          val (title, subreddit, url, imageSet) = items[position]
+          val (title, subreddit, url, selftext, imageSet) = items[position]
           holder.view.setOnClickListener {
             clickedItems.onNext(items[position])
           }
@@ -128,6 +128,15 @@ open class HelloActivity : Activity() {
           holder.subredditView.text = subreddit
 
           val img = imageSet?.biggestImage(width)
+
+          if (selftext == null) {
+            holder.body.visibility = View.GONE
+            holder.line.visibility = View.GONE
+          } else {
+            holder.body.visibility = View.VISIBLE
+            holder.line.visibility = View.VISIBLE
+            holder.body.text = selftext
+          }
 
           if (img == null || img.url.isBlank()) {
             holder.thumbnail.setImageDrawable(null)
@@ -148,6 +157,8 @@ open class HelloActivity : Activity() {
       val titleView = view.findViewById(R.id.title) as TextView
       val subredditView = view.findViewById(R.id.subreddit) as TextView
       val thumbnail = view.findViewById(R.id.thumbnail) as ImageView
+      val body = view.findViewById(R.id.body) as TextView
+      val line = view.findViewById(R.id.line)
     }
 
     class LoadingViewHolder(val view: View) : RecyclerView.ViewHolder(view)

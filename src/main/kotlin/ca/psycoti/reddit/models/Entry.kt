@@ -13,8 +13,12 @@ import java.util.ArrayList
 import java.lang.reflect.Type
 
 import com.github.salomonbrys.kotson.*
+import android.text.Spanned
+import android.text.Html
 
-data class Entry(val title: String, val subreddit: String, val url: String, val images: ImageSet?) {
+fun String.fromHtml() = Html.fromHtml(this)
+
+data class Entry(val title: String, val subreddit: String, val url: String, val selfText: Spanned?, val images: ImageSet?) {
   object Deserializer: JsonDeserializer<Entry> {
     override fun deserialize(je: JsonElement, type: Type, jdc: JsonDeserializationContext): Entry
     {
@@ -24,7 +28,12 @@ data class Entry(val title: String, val subreddit: String, val url: String, val 
         ImageSet.parse(data["preview"])
         else null
 
-      return Entry(data["title"].string, data["subreddit"].string, data["url"].string, imageSet)
+      return Entry(
+        data["title"].string,
+        data["subreddit"].string,
+        data["url"].string,
+        data["selftext_html"].nullString?.fromHtml(),
+        imageSet)
     }
   }
 
