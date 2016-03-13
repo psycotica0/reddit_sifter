@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Kotlin Reddit</string>
     <string name="view_link">View Link</string>
+    <string name="loading">Loading</string>
 </resources>
