@@ -64,22 +64,29 @@ open class HelloActivity : Activity() {
         val oldLast = adapter.getItemCount() - 1
         adapter.items = listing.entries
 
-        // Get rid of the loading spinner
-        adapter.notifyItemRemoved(oldLast)
-
-        diff.items.forEach({
-          when(it) {
-            is Listing.Insert -> {
-              adapter.notifyItemInserted(it.pos)
+        if (oldLast == 0) {
+          // This is the first run, remove spinner, it's all inserts
+          // If I let it go through the other logic, it works but moves the
+          // spinner to the bottom of the screen and only loads stuff above
+          // that
+          adapter.notifyItemRemoved(oldLast)
+          adapter.notifyItemRangeInserted(oldLast, adapter.getItemCount())
+        } else {
+          // We put everything at +1, then move the spinner at the end
+          diff.items.forEach({
+            when(it) {
+              is Listing.Insert -> {
+                adapter.notifyItemInserted(it.pos + 1)
+              }
+              is Listing.Move -> {
+                adapter.notifyItemMoved(it.from, it.to + 1)
+              }
             }
-            is Listing.Move -> {
-              adapter.notifyItemMoved(it.from, it.to)
-            }
-          }
-        })
+          })
 
-        // Put the loading spinner back at the end
-        adapter.notifyItemInserted(adapter.getItemCount() - 1)
+          // Move the spinner back to the end
+          adapter.notifyItemMoved(oldLast, adapter.getItemCount() - 1)
+        }
       },
       {err -> Toast.makeText(this, err.toString(), Toast.LENGTH_LONG).show()}
     )
