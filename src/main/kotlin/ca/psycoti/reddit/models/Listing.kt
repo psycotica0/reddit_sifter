@@ -54,14 +54,14 @@ data class Listing(val kind: String, val entries: MutableList<Entry>, var after:
         if (pos == -1) {
           // New item
           this.entries.add(item)
-          l("New " + idx + 1)
+          l("New " + idx)
           return Pair(idx + 1, ops + Insert(idx, item))
         } else {
           // Move
-          l("Move " + pos + " to "+ idx)
+          l("Move " + pos + " to "+ (idx - 1))
           this.entries.removeAt(pos)
           this.entries.add(item)
-          return Pair(idx, ops + Move(pos, idx))
+          return Pair(idx, ops + Move(pos, idx - 1))
         }
       }
     )
