@@ -29,6 +29,8 @@ import ca.psycoti.reddit.network.HotService
 import ca.psycoti.reddit.models.Entry
 import ca.psycoti.reddit.models.Listing
 
+import android.support.v7.widget.helper.ItemTouchHelper
+
 open class HelloActivity : Activity() {
   lateinit var entries: RecyclerView
   val listing = Listing()
@@ -42,6 +44,20 @@ open class HelloActivity : Activity() {
     entries.layoutManager = LinearLayoutManager(this)
 
     entries.setAdapter(adapter)
+
+    val swipeCallback = SwipeCallback()
+    ItemTouchHelper(swipeCallback).attachToRecyclerView(entries)
+
+    swipeCallback.itemHidden.subscribe {
+      // Currently I just temporarily remove it
+      adapter.items.removeAt(it)
+      adapter.notifyItemRemoved(it)
+    }
+
+    swipeCallback.itemStashed.subscribe {
+      // Do nothing for now
+      adapter.notifyItemChanged(it)
+    }
 
     adapter.clickedItems.subscribe {
       //startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.url)))
@@ -92,7 +108,7 @@ open class HelloActivity : Activity() {
     )
   }
 
-  class EntryAdapter(val context : Context, var items : List<Entry> = ArrayList()): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+  class EntryAdapter(val context : Context, var items : MutableList<Entry> = ArrayList()): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount() = items.count() + 1
     var width: Int = 0
     val clickedItems = PublishSubject.create<Entry>()
@@ -122,7 +138,9 @@ open class HelloActivity : Activity() {
         is EntryViewHolder -> {
           val (title, subreddit, url, selftext, imageSet) = items[position]
           holder.view.setOnClickListener {
-            clickedItems.onNext(items[position])
+            // Get the position again, because it might have changed since we
+            // built this
+            clickedItems.onNext(items[holder.getAdapterPosition()])
           }
           holder.titleView.text = title
           holder.subredditView.text = subreddit
@@ -163,4 +181,31 @@ open class HelloActivity : Activity() {
 
     class LoadingViewHolder(val view: View) : RecyclerView.ViewHolder(view)
   }
+
+  class SwipeCallback : ItemTouchHelper.Callback() {
+
+    val itemHidden = PublishSubject.create<Int>()
+    val itemStashed = PublishSubject.create<Int>()
+
+    override fun getMovementFlags(recycler: RecyclerView, holder: RecyclerView.ViewHolder): Int {
+      when(holder) {
+        is EntryAdapter.LoadingViewHolder -> return 0
+        else -> return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.START or ItemTouchHelper.END)
+      }
+    }
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+      when(direction) {
+        ItemTouchHelper.START -> itemStashed.onNext(viewHolder.getAdapterPosition())
+        ItemTouchHelper.END -> itemHidden.onNext(viewHolder.getAdapterPosition())
+      }
+    }
+
+    override fun onMove(
+      recycler: RecyclerView,
+      view1: RecyclerView.ViewHolder,
+      view2: RecyclerView.ViewHolder) = false
+  }
+
+
 }
